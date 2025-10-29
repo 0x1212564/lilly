@@ -46,11 +46,12 @@ void BTN_init(void) {
  */
 void TMR_init_debounce(void) {
     // Klokbron instellen op 32MHz / 1024 = 31250 Hz
-    TCC0.CTRLA = TC_CLKSEL_DIV1024_gc; 
+    TCC0.CTRLA = TC_CLKSEL_OFF_gc; 
     
     // PER (Period) instellen voor 50ms (0.05s)
     // Counts = 31250 Hz * 0.05s = 1562.5
     // We ronden af naar 1563
+    TCC0.CNT = 0; 
     TCC0.PER = 1563; 
     
     // Overflow interrupt instellen op low-level

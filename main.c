@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @brief Hoofdapplicatie voor de Xmega Kirby Image Cycler.
- * @author [Jouw Naam]
+ * @author Lylian Tai
  * @date 29-10-2025
  *
  * Project dat 5 Xmega features gebruikt om te voldoen aan de eindopdracht:
@@ -42,6 +42,7 @@ ISR(PORTD_INT0_vect) {
  * Wordt 50ms na de knopdruk uitgevoerd.
  */
 ISR(TCC0_OVF_vect) {
+    TCC0.INTFLAGS = TC_OVFIF_bm; // Clear de overflow-vlag
     // 1. Stop de timer
     TCC0.CTRLA = TC_CLKSEL_OFF_gc;
     
@@ -79,10 +80,12 @@ int main(void) {
     // 2. Hoofdlus (Superloop)
     while (1) {
         
+        
         // Moet het display bijgewerkt worden?
+        cli();
         if (g_update_display) {
             g_update_display = false; // Reset de vlag
-
+            sei();
             // Haal de pointer naar de juiste afbeelding op uit PROGMEM
             // pgm_read_word leest een 'word' (16-bit) uit het PROGMEM-geheugen
             const uint16_t* image_ptr = (const uint16_t*)pgm_read_word(
@@ -92,6 +95,8 @@ int main(void) {
             // Stuur de afbeelding naar het display
             ST7735_draw_image_from_progmem(image_ptr);
         }
+        sei();
+        
         
         // De CPU kan hier andere taken doen of in slaapstand gaan
         // (De interrupt breekt hier vanzelf in)
